@@ -2586,7 +2586,33 @@ nm_utils_is_specific_hostname (const char *name)
 	return FALSE;
 }
 
-/******************************************************************/
+/*****************************************************************************/
+
+char *
+nm_utils_binary_to_hex (gconstpointer addr, gsize length)
+{
+	const guint8 *in = addr;
+	char *out, *result;
+	const char *LOOKUP = "0123456789abcdef";
+	guint8 v;
+
+	if (length == 0)
+		return g_strdup ("");
+	if (!addr)
+		g_return_val_if_reached (g_strdup (""));
+
+	result = out = g_malloc (length * 2 + 1);
+	while (length--) {
+		v = *in++;
+		*out++ = LOOKUP[v >> 4];
+		*out++ = LOOKUP[v & 0x0F];
+	}
+
+	*out = 0;
+	return result;
+}
+
+/*****************************************************************************/
 
 /* Returns the "u" (universal/local) bit value for a Modified EUI-64 */
 static gboolean

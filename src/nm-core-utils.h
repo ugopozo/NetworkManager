@@ -307,6 +307,8 @@ const char *nm_utils_ip4_property_path (const char *ifname, const char *property
 
 gboolean nm_utils_is_specific_hostname (const char *name);
 
+char *nm_utils_binary_to_hex (gconstpointer addr, gsize length);
+
 /* IPv6 Interface Identifer helpers */
 
 /**
