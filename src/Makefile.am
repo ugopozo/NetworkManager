@@ -273,6 +273,7 @@ nm_device_sources = \
 	devices/nm-device-ethernet.c \
 	devices/nm-device-infiniband.c \
 	devices/nm-device-ip-tunnel.c \
+	devices/nm-device-macsec.c \
 	devices/nm-device-macvlan.c \
 	devices/nm-device-tun.c \
 	devices/nm-device-veth.c \
@@ -286,6 +287,7 @@ nm_device_headers = \
 	devices/nm-device-ethernet.h \
 	devices/nm-device-infiniband.h \
 	devices/nm-device-ip-tunnel.h \
+	devices/nm-device-macsec.h \
 	devices/nm-device-macvlan.h \
 	devices/nm-device-tun.h \
 	devices/nm-device-veth.h \

@@ -1065,6 +1065,20 @@ libnm_1_2_4 {
 
 libnm_1_4_0 {
 global:
+	nm_device_macsec_get_cipher_suite;
+	nm_device_macsec_get_encoding_sa;
+	nm_device_macsec_get_encrypt;
+	nm_device_macsec_get_es;
+	nm_device_macsec_get_hw_address;
+	nm_device_macsec_get_icv_length;
+	nm_device_macsec_get_include_sci;
+	nm_device_macsec_get_protect;
+	nm_device_macsec_get_replay_protect;
+	nm_device_macsec_get_scb;
+	nm_device_macsec_get_sci;
+	nm_device_macsec_get_type;
+	nm_device_macsec_get_validation;
+	nm_device_macsec_get_window;
 	nm_device_team_get_config;
 	nm_setting_connection_get_stable_id;
 	nm_setting_ip6_config_get_token;

@@ -37,6 +37,8 @@ nodist_libnmdbus_la_SOURCES = \
 	nmdbus-device-infiniband.h \
 	nmdbus-device-ip-tunnel.c \
 	nmdbus-device-ip-tunnel.h \
+	nmdbus-device-macsec.c \
+	nmdbus-device-macsec.h \
 	nmdbus-device-macvlan.c \
 	nmdbus-device-macvlan.h \
 	nmdbus-device-modem.c \
@@ -96,6 +98,7 @@ DBUS_INTERFACE_DOCS = \
 	nmdbus-device-vxlan-org.freedesktop.NetworkManager.Device.Vxlan.xml \
 	nmdbus-settings-connection-org.freedesktop.NetworkManager.Settings.Connection.xml \
 	nmdbus-device-bond-org.freedesktop.NetworkManager.Device.Bond.xml \
+	nmdbus-device-macsec-org.freedesktop.NetworkManager.Device.Macsec.xml \
 	nmdbus-device-macvlan-org.freedesktop.NetworkManager.Device.Macvlan.xml \
 	nmdbus-ppp-manager-org.freedesktop.NetworkManager.PPP.xml \
 	nmdbus-device-vlan-org.freedesktop.NetworkManager.Device.Vlan.xml \
@@ -151,6 +154,7 @@ EXTRA_DIST = \
 	nm-device-generic.xml \
 	nm-device-infiniband.xml \
 	nm-device-ip-tunnel.xml \
+	nm-device-macsec.xml \
 	nm-device-macvlan.xml \
 	nm-device-modem.xml \
 	nm-device-olpc-mesh.xml \
