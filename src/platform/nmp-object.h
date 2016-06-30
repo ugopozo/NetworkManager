@@ -211,6 +211,10 @@ typedef struct {
 } NMPObjectLnkIpIp;
 
 typedef struct {
+	NMPlatformLnkMacsec _public;
+} NMPObjectLnkMacsec;
+
+typedef struct {
 	NMPlatformLnkMacvlan _public;
 } NMPObjectLnkMacvlan;
 
@@ -270,6 +274,9 @@ struct _NMPObject {
 
 		NMPlatformLnkIp6Tnl     lnk_ip6tnl;
 		NMPObjectLnkIp6Tnl      _lnk_ip6tnl;
+
+		NMPlatformLnkMacsec     lnk_macsec;
+		NMPObjectLnkMacsec      _lnk_macsec;
 
 		NMPlatformLnkMacvlan    lnk_macvlan;
 		NMPObjectLnkMacvlan     _lnk_macvlan;
