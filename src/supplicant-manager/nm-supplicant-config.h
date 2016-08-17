@@ -83,8 +83,8 @@ gboolean nm_supplicant_config_add_setting_8021x (NMSupplicantConfig *self,
                                                  gboolean wired,
                                                  GError **error);
 
-gboolean nm_supplicant_config_add_setting_macsec (NMSupplicantConfig * self,
-                                                  NMSettingMacsec * setting,
+gboolean nm_supplicant_config_add_setting_macsec (NMSupplicantConfig *self,
+                                                  NMSettingMacsec *setting,
                                                   GError **error);
 
 G_END_DECLS
