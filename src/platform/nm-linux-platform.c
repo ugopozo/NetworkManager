@@ -1155,7 +1155,7 @@ _parse_lnk_macsec (const char *kind, struct nlattr *info_data)
 	NMPObject *obj;
 	NMPlatformLnkMacsec *props;
 
-	if (!info_data || !nm_streq (kind, "macsec"))
+	if (!info_data || !nm_streq0 (kind, "macsec"))
 		return NULL;
 
 	err = nla_parse_nested (tb, __IFLA_MACSEC_MAX - 1, info_data, policy);
