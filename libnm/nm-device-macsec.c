@@ -48,7 +48,7 @@ typedef struct {
 	char *validation;
 } NMDeviceMacsecPrivate;
 
-NM_GOBJECT_PROPERTIES_DEFINE (NMDeviceMacsec,
+NM_GOBJECT_PROPERTIES_DEFINE_BASE (
 	PROP_PARENT,
 	PROP_HW_ADDRESS,
 	PROP_SCI,
