@@ -136,6 +136,12 @@ NM_DEFINE_SINGLETON_REGISTER (NMPlatform);
 		(void) klass; \
 	} while (0)
 
+#define _CHECK_SELF_NETNS(self, klass, netns, retval) \
+	nm_auto_pop_netns NMPNetns *netns = NULL; \
+	_CHECK_SELF (self, klass, FALSE); \
+	if (!nm_platform_netns_push (self, &netns)) \
+		return (retval); \
+
 /**
  * nm_platform_setup:
  * @instance: the #NMPlatform instance
@@ -2472,25 +2478,25 @@ _to_string_ifa_flags (guint32 ifa_flags, char *buf, gsize size)
 gboolean
 nm_platform_ethtool_set_wake_on_lan (NMPlatform *self, const char *ifname, NMSettingWiredWakeOnLan wol, const char *wol_password)
 {
-	nm_auto_pop_netns NMPNetns *netns = NULL;
-	_CHECK_SELF (self, klass, FALSE);
-
-	if (!nm_platform_netns_push (self, &netns))
-		return FALSE;
+	_CHECK_SELF_NETNS (self, klass, netns, FALSE);
 
 	return nmp_utils_ethtool_set_wake_on_lan (ifname, wol, wol_password);
 }
 
 gboolean
-nm_platform_ethtool_get_link_speed (NMPlatform *self, const char *ifname, guint32 *out_speed)
+nm_platform_ethtool_set_link_settings (NMPlatform *self, const char *ifname, gboolean autoneg, guint32 speed, gboolean duplex_full)
 {
-	nm_auto_pop_netns NMPNetns *netns = NULL;
-	_CHECK_SELF (self, klass, FALSE);
+	_CHECK_SELF_NETNS (self, klass, netns, FALSE);
 
-	if (!nm_platform_netns_push (self, &netns))
-		return FALSE;
+	return nmp_utils_ethtool_set_link_settings (ifname, autoneg, speed, duplex_full);
+}
 
-	return nmp_utils_ethtool_get_link_speed (ifname, out_speed);
+gboolean
+nm_platform_ethtool_get_link_settings (NMPlatform *self, const char *ifname, gboolean *out_autoneg, guint32 *out_speed, gboolean *out_duplex_full)
+{
+	_CHECK_SELF_NETNS (self, klass, netns, FALSE);
+
+	return nmp_utils_ethtool_get_link_settings (ifname, out_autoneg, out_speed, out_duplex_full);
 }
 
 /******************************************************************/

@@ -973,6 +973,7 @@ const char *nm_platform_route_scope2str (int scope, char *buf, gsize len);
 int nm_platform_ip_address_cmp_expiry (const NMPlatformIPAddress *a, const NMPlatformIPAddress *b);
 
 gboolean nm_platform_ethtool_set_wake_on_lan (NMPlatform *self, const char *ifname, NMSettingWiredWakeOnLan wol, const char *wol_password);
-gboolean nm_platform_ethtool_get_link_speed (NMPlatform *self, const char *ifname, guint32 *out_speed);
+gboolean nm_platform_ethtool_set_link_settings (NMPlatform *self, const char *ifname, gboolean autoneg, guint32 speed, gboolean duplex_full);
+gboolean nm_platform_ethtool_get_link_settings (NMPlatform *self, const char *ifname, gboolean *out_autoneg, guint32 *out_speed, gboolean *out_duplex_full);
 
 #endif /* __NETWORKMANAGER_PLATFORM_H__ */
