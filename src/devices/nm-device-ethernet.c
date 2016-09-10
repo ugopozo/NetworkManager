@@ -784,6 +784,50 @@ supplicant_interface_init (NMDeviceEthernet *self)
 	return TRUE;
 }
 
+static void
+link_negotiation_set (NMDevice *device)
+{
+	NMDeviceEthernet *self = NM_DEVICE_ETHERNET (device);
+	NMSettingWired *s_wired;
+	gboolean autoneg = TRUE, link_autoneg, link_duplex_full;
+	const char *duplex = NULL;
+	guint32 speed = 0, link_speed;
+
+	s_wired = (NMSettingWired *) nm_device_get_applied_setting (device, NM_TYPE_SETTING_WIRED);
+	if (s_wired) {
+		autoneg = nm_setting_wired_get_auto_negotiate (s_wired);
+		if (!autoneg) {
+			speed = nm_setting_wired_get_speed (s_wired);
+			duplex = nm_setting_wired_get_duplex (s_wired);
+		}
+	}
+
+	if (!nm_platform_ethtool_get_link_settings (NM_PLATFORM_GET, nm_device_get_iface (device),
+	                                            &link_autoneg, &link_speed, &link_duplex_full)) {
+		_LOGW (LOGD_DEVICE, "set-link: unable to retrieve link negotiation");
+		return;
+	}
+
+	/* If link negotiation setting are already in place do nothing and return with success */
+	if (    (autoneg == link_autoneg)
+             && (autoneg || ((link_speed == speed) && (nm_streq0 (duplex, "full") == link_duplex_full))))
+		return;
+
+	if (!nm_platform_ethtool_set_link_settings (NM_PLATFORM_GET,
+	                                                nm_device_get_iface (device),
+	                                                autoneg,
+	                                                speed,
+	                                                nm_streq0 (duplex, "full"))) {
+		_LOGW (LOGD_DEVICE, "set-link: failure to set link negotiation");
+		return;
+	}
+
+	if (autoneg)
+		_LOGD (LOGD_DEVICE, "set-link: configure autonegotiation");
+	else
+		_LOGD (LOGD_DEVICE, "set-link: configure static negotiation (%u Mbit - %s duplex)", speed, duplex);
+}
+
 static gboolean
 pppoe_reconnect_delay (gpointer user_data)
 {
@@ -808,6 +852,8 @@ act_stage1_prepare (NMDevice *dev, NMDeviceStateReason *reason)
 	ret = NM_DEVICE_CLASS (nm_device_ethernet_parent_class)->act_stage1_prepare (dev, reason);
 	if (ret != NM_ACT_STAGE_RETURN_SUCCESS)
 		return ret;
+
+	link_negotiation_set (dev);
 
 	if (!nm_device_hw_addr_set_cloned (dev, nm_device_get_applied_connection (dev), FALSE))
 		return NM_ACT_STAGE_RETURN_FAILURE;
