@@ -1015,8 +1015,9 @@ nm_setting_wired_class_init (NMSettingWiredClass *setting_wired_class)
 	 **/
 	/* ---ifcfg-rh---
 	 * property: speed
-	 * variable: (none)
-	 * description: The property is not saved by the plugin.
+	 * variable: ETHTOOL_OPTS
+	 * description: Fixed speed for the ethernet link. It is added as "speed"
+	 *    parameter in the ETHTOOL_OPTS variable.
 	 * ---end---
 	 */
 	g_object_class_install_property
@@ -1035,8 +1036,9 @@ nm_setting_wired_class_init (NMSettingWiredClass *setting_wired_class)
 	 **/
 	/* ---ifcfg-rh---
 	 * property: duplex
-	 * variable: (none)
-	 * description: The property is not saved by the plugin.
+	 * variable: ETHTOOL_OPTS
+	 * description: Fixed duplex mode for the ethernet link. Is is added as
+	 *    "duplex" parameter in the ETHOOL_OPTS variable.
 	 * ---end---
 	 */
 	g_object_class_install_property
@@ -1055,8 +1057,10 @@ nm_setting_wired_class_init (NMSettingWiredClass *setting_wired_class)
 	 **/
 	/* ---ifcfg-rh---
 	 * property: auto-negotiate
-	 * variable: (none)
-	 * description: The property is not saved by the plugin.
+	 * variable: ETHTOOL_OPTS
+	 * description: Wether link speed and duplex autonegotiation is enabled.
+	 *    It is saved only if is disabled, together with the "speed" and
+	 *    "duplex" parameters.
 	 * ---end---
 	 */
 	g_object_class_install_property
