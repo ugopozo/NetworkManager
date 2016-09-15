@@ -765,6 +765,14 @@ verify (NMSetting *setting, NMConnection *connection, GError **error)
 		return FALSE;
 	}
 
+	if (!priv->auto_negotiate && (!priv->speed || !priv->duplex)) {
+		g_set_error_literal (error,
+		                     NM_CONNECTION_ERROR,
+		                     NM_CONNECTION_ERROR_INVALID_PROPERTY,
+		                     _("to turn it off valid values for 'speed' and 'duplex' are required"));
+		g_prefix_error (error, "%s.%s: ", NM_SETTING_WIRED_SETTING_NAME, NM_SETTING_WIRED_AUTO_NEGOTIATE);
+		return FALSE;
+	}
 	return TRUE;
 }
 
