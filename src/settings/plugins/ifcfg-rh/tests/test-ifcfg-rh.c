@@ -2933,6 +2933,30 @@ test_read_wired_wake_on_lan (void)
 }
 
 static void
+test_read_wired_auto_negotiate (void)
+{
+	NMConnection *connection;
+	NMSettingConnection *s_con;
+	NMSettingWired *s_wired;
+
+	connection = _connection_from_file (TEST_IFCFG_DIR"/network-scripts/ifcfg-test-wired-wake-on-lan",
+	                                    NULL, TYPE_ETHERNET, NULL);
+
+	s_con = nm_connection_get_setting_connection (connection);
+	g_assert (s_con);
+	g_assert_cmpstr (nm_setting_connection_get_connection_type (s_con), ==, NM_SETTING_WIRED_SETTING_NAME);
+
+	s_wired = nm_connection_get_setting_wired (connection);
+	g_assert (s_wired);
+
+	g_assert (!nm_setting_wired_get_auto_negotiate (s_wired));
+	g_assert_cmpint (nm_setting_wired_get_speed (s_wired), ==, 100);
+	g_assert_cmpstr (nm_setting_wired_get_duplex (s_wired), ==, "full");
+
+	g_object_unref (connection);
+}
+
+static void
 test_read_wifi_hidden (void)
 {
 	NMConnection *connection;
@@ -3171,6 +3195,69 @@ test_write_wired_wake_on_lan (void)
 	g_assert (val);
 	g_assert (strstr (val, "wol"));
 	g_assert (strstr (val, "sopass 00:00:00:11:22:33"));
+	g_free (val);
+	svCloseFile (f);
+
+	reread = _connection_from_file (testfile, NULL, TYPE_ETHERNET, NULL);
+	unlink (testfile);
+
+	nmtst_assert_connection_equals (connection, TRUE, reread, FALSE);
+
+	g_free (testfile);
+	g_object_unref (connection);
+	g_object_unref (reread);
+}
+
+static void
+test_write_wired_auto_negotiate (void)
+{
+	NMConnection *connection, *reread;
+	NMSettingConnection *s_con;
+	NMSettingWired *s_wired;
+	char *uuid, *testfile = NULL, *val;
+	GError *error = NULL;
+	shvarFile *f;
+
+	connection = nm_simple_connection_new ();
+
+	/* Connection setting */
+	s_con = (NMSettingConnection *) nm_setting_connection_new ();
+	nm_connection_add_setting (connection, NM_SETTING (s_con));
+
+	uuid = nm_utils_uuid_generate ();
+	g_object_set (s_con,
+	              NM_SETTING_CONNECTION_ID, "Test Write Wired Auto-Negotiate",
+	              NM_SETTING_CONNECTION_UUID, uuid,
+	              NM_SETTING_CONNECTION_TYPE, NM_SETTING_WIRED_SETTING_NAME,
+	              NULL);
+	g_free (uuid);
+
+	/* Wired setting */
+	s_wired = (NMSettingWired *) nm_setting_wired_new ();
+	nm_connection_add_setting (connection, NM_SETTING (s_wired));
+
+	g_object_set (s_wired,
+	              NM_SETTING_WIRED_AUTO_NEGOTIATE, FALSE,
+	              NM_SETTING_WIRED_DUPLEX, "half",
+	              NM_SETTING_WIRED_SPEED, 10,
+	              NULL);
+
+	nmtst_assert_connection_verifies (connection);
+
+	_writer_new_connection (connection,
+	                        TEST_SCRATCH_DIR "/network-scripts/",
+	                        &testfile);
+
+	f = svOpenFile (testfile, &error);
+	g_assert_no_error (error);
+	g_assert (f);
+
+	/* re-read the file to check that the key was written. */
+	val = svGetValue (f, "ETHTOOL_OPTS", FALSE);
+	g_assert (val);
+	g_assert (strstr (val, "autoneg off"));
+	g_assert (strstr (val, "speed 10"));
+	g_assert (strstr (val, "duplex half"));
 	g_free (val);
 	svCloseFile (f);
 
@@ -8970,6 +9057,7 @@ int main (int argc, char **argv)
 	g_test_add_func (TPATH "vlan/read/reorder-hdr-1", test_read_vlan_reorder_hdr_1);
 	g_test_add_func (TPATH "vlan/read/reorder-hdr-2", test_read_vlan_reorder_hdr_2);
 	g_test_add_func (TPATH "wired/read/read-wake-on-lan", test_read_wired_wake_on_lan);
+	g_test_add_func (TPATH "wired/read/read-auto-negotiate", test_read_wired_auto_negotiate);
 
 	g_test_add_func (TPATH "wired/write/static", test_write_wired_static);
 	g_test_add_func (TPATH "wired/write/static-ip6-only", test_write_wired_static_ip6_only);
@@ -8989,6 +9077,7 @@ int main (int argc, char **argv)
 	g_test_add_func (TPATH "wired/write-aliases", test_write_wired_aliases);
 	g_test_add_func (TPATH "ipv4/write-static-addresses-GATEWAY", test_write_gateway);
 	g_test_add_func (TPATH "wired/write-wake-on-lan", test_write_wired_wake_on_lan);
+	g_test_add_func (TPATH "wired/write-auto-negotiate", test_write_wired_auto_negotiate);
 	g_test_add_func (TPATH "wifi/write/open", test_write_wifi_open);
 	g_test_add_func (TPATH "wifi/write/open/hex-ssid", test_write_wifi_open_hex_ssid);
 	g_test_add_func (TPATH "wifi/write/wep", test_write_wifi_wep);
