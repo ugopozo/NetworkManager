@@ -260,8 +260,6 @@ nm_device_macvlan_class_init (NMDeviceMacvlanClass *gre_class)
 
 	g_type_class_add_private (gre_class, sizeof (NMDeviceMacvlanPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_MACVLAN);
-
 	/* virtual methods */
 	object_class->finalize = finalize;
 	object_class->get_property = get_property;

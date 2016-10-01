@@ -733,9 +733,6 @@ nm_remote_settings_class_init (NMRemoteSettingsClass *class)
 
 	g_type_class_add_private (class, sizeof (NMRemoteSettingsPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_SETTINGS);
-	_nm_dbus_register_proxy_type (NM_DBUS_INTERFACE_SETTINGS, NMDBUS_TYPE_SETTINGS_PROXY);
-
 	/* Virtual methods */
 	object_class->constructor = constructor;
 	object_class->get_property = get_property;

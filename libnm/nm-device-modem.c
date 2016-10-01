@@ -208,8 +208,6 @@ nm_device_modem_class_init (NMDeviceModemClass *modem_class)
 
 	g_type_class_add_private (modem_class, sizeof (NMDeviceModemPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_MODEM);
-
 	/* virtual methods */
 	object_class->get_property = get_property;
 

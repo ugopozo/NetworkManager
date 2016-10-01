@@ -213,8 +213,6 @@ nm_device_bond_class_init (NMDeviceBondClass *bond_class)
 
 	g_type_class_add_private (bond_class, sizeof (NMDeviceBondPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_BOND);
-
 	/* virtual methods */
 	object_class->dispose = dispose;
 	object_class->finalize = finalize;

@@ -1462,9 +1462,6 @@ nm_manager_class_init (NMManagerClass *manager_class)
 
 	g_type_class_add_private (manager_class, sizeof (NMManagerPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE);
-	_nm_dbus_register_proxy_type (NM_DBUS_INTERFACE, NMDBUS_TYPE_MANAGER_PROXY);
-
 	/* virtual methods */
 	object_class->constructed = constructed;
 	object_class->set_property = set_property;

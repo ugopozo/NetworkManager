@@ -239,8 +239,6 @@ nm_device_team_class_init (NMDeviceTeamClass *team_class)
 
 	g_type_class_add_private (team_class, sizeof (NMDeviceTeamPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_TEAM);
-
 	/* virtual methods */
 	object_class->dispose = dispose;
 	object_class->finalize = finalize;

@@ -174,8 +174,6 @@ nm_device_generic_class_init (NMDeviceGenericClass *klass)
 
 	g_type_class_add_private (klass, sizeof (NMDeviceGenericPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_GENERIC);
-
 	object_class->finalize = finalize;
 	object_class->get_property = get_property;
 

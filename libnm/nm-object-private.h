@@ -59,8 +59,6 @@ void _nm_object_register_type_func (GType base_type,
                                     const char *interface,
                                     const char *property);
 
-void _nm_object_class_add_interface (NMObjectClass *object_class,
-                                     const char    *interface);
 GDBusProxy *_nm_object_get_proxy (NMObject   *object,
                                   const char *interface);
 

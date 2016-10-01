@@ -516,8 +516,6 @@ nm_active_connection_class_init (NMActiveConnectionClass *ap_class)
 
 	g_type_class_add_private (ap_class, sizeof (NMActiveConnectionPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_ACTIVE_CONNECTION);
-
 	/* virtual methods */
 	object_class->get_property = get_property;
 	object_class->dispose = dispose;

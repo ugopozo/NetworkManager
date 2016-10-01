@@ -204,8 +204,6 @@ nm_device_olpc_mesh_class_init (NMDeviceOlpcMeshClass *olpc_mesh_class)
 
 	g_type_class_add_private (olpc_mesh_class, sizeof (NMDeviceOlpcMeshPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_OLPC_MESH);
-
 	/* virtual methods */
 	object_class->dispose = dispose;
 	object_class->finalize = finalize;

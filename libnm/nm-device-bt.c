@@ -248,8 +248,6 @@ nm_device_bt_class_init (NMDeviceBtClass *bt_class)
 
 	g_type_class_add_private (bt_class, sizeof (NMDeviceBtPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_BLUETOOTH);
-
 	/* virtual methods */
 	object_class->finalize = finalize;
 	object_class->get_property = get_property;

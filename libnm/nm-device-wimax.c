@@ -530,8 +530,6 @@ nm_device_wimax_class_init (NMDeviceWimaxClass *wimax_class)
 
 	g_type_class_add_private (wimax_class, sizeof (NMDeviceWimaxPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_WIMAX);
-
 	/* virtual methods */
 	object_class->get_property = get_property;
 	object_class->dispose = dispose;

@@ -238,8 +238,6 @@ nm_device_vlan_class_init (NMDeviceVlanClass *vlan_class)
 
 	g_type_class_add_private (vlan_class, sizeof (NMDeviceVlanPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_VLAN);
-
 	/* virtual methods */
 	object_class->finalize = finalize;
 	object_class->get_property = get_property;

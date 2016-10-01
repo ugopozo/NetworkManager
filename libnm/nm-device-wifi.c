@@ -803,10 +803,6 @@ nm_device_wifi_class_init (NMDeviceWifiClass *wifi_class)
 
 	g_type_class_add_private (wifi_class, sizeof (NMDeviceWifiPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_WIRELESS);
-	_nm_dbus_register_proxy_type (NM_DBUS_INTERFACE_DEVICE_WIRELESS,
-	                              NMDBUS_TYPE_DEVICE_WIFI_PROXY);
-
 	/* virtual methods */
 	object_class->get_property = get_property;
 	object_class->dispose = dispose;

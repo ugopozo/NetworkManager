@@ -507,9 +507,6 @@ nm_device_class_init (NMDeviceClass *device_class)
 
 	g_type_class_add_private (device_class, sizeof (NMDevicePrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE);
-	_nm_dbus_register_proxy_type (NM_DBUS_INTERFACE_DEVICE, NMDBUS_TYPE_DEVICE_PROXY);
-
 	/* virtual methods */
 	object_class->constructed = constructed;
 	object_class->get_property = get_property;

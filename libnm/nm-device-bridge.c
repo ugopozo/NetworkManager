@@ -213,8 +213,6 @@ nm_device_bridge_class_init (NMDeviceBridgeClass *bridge_class)
 
 	g_type_class_add_private (bridge_class, sizeof (NMDeviceBridgePrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_BRIDGE);
-
 	/* virtual methods */
 	object_class->dispose = dispose;
 	object_class->finalize = finalize;

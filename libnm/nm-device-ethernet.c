@@ -357,8 +357,6 @@ nm_device_ethernet_class_init (NMDeviceEthernetClass *eth_class)
 
 	g_type_class_add_private (eth_class, sizeof (NMDeviceEthernetPrivate));
 
-	_nm_object_class_add_interface (nm_object_class, NM_DBUS_INTERFACE_DEVICE_WIRED);
-
 	/* virtual methods */
 	object_class->finalize = finalize;
 	object_class->get_property = get_property;
