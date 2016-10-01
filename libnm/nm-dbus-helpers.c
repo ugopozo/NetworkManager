@@ -98,24 +98,7 @@ _nm_dbus_is_connection_private (GDBusConnection *connection)
 	return g_dbus_connection_get_unique_name (connection) == NULL;
 }
 
-static GHashTable *proxy_types;
-
-#undef _nm_dbus_register_proxy_type
-void
-_nm_dbus_register_proxy_type (const char *interface,
-                              GType       proxy_type)
-{
-	if (!proxy_types)
-		proxy_types = g_hash_table_new (g_str_hash, g_str_equal);
-
-	g_assert (g_hash_table_lookup (proxy_types, interface) == NULL);
-	g_hash_table_insert (proxy_types, (char *) interface, GSIZE_TO_POINTER (proxy_type));
-}
-
-/* We don't (currently) use GDBus's property-handling code */
-#define NM_DBUS_PROXY_FLAGS (G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES | \
-                             G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START)
-
+#if 0
 /* D-Bus has an upper limit on number of Match rules and it's rather easy
  * to hit as the proxy likes to add one for each object. Let's remove the Match
  * rule the proxy added and ensure a less granular rule is present instead.
@@ -176,83 +159,7 @@ _nm_dbus_proxy_replace_match (GDBusProxy *proxy)
 	                        NULL);
 	g_free (match);
 }
-
-GDBusProxy *
-_nm_dbus_new_proxy_for_connection (GDBusConnection *connection,
-                                   const char *path,
-                                   const char *interface,
-                                   GCancellable *cancellable,
-                                   GError **error)
-{
-	GDBusProxy *proxy;
-	GType proxy_type;
-	const char *name;
-
-	proxy_type = GPOINTER_TO_SIZE (g_hash_table_lookup (proxy_types, interface));
-	if (!proxy_type)
-		proxy_type = G_TYPE_DBUS_PROXY;
-
-	if (_nm_dbus_is_connection_private (connection))
-		name = NULL;
-	else
-		name = NM_DBUS_SERVICE;
-
-	proxy = g_initable_new (proxy_type, cancellable, error,
-	                        "g-connection", connection,
-	                        "g-flags", NM_DBUS_PROXY_FLAGS,
-	                        "g-name", name,
-	                        "g-object-path", path,
-	                        "g-interface-name", interface,
-	                        NULL);
-	_nm_dbus_proxy_replace_match (proxy);
-
-	return proxy;
-}
-
-void
-_nm_dbus_new_proxy_for_connection_async (GDBusConnection *connection,
-                                         const char *path,
-                                         const char *interface,
-                                         GCancellable *cancellable,
-                                         GAsyncReadyCallback callback,
-                                         gpointer user_data)
-{
-	GType proxy_type;
-	const char *name;
-
-	proxy_type = GPOINTER_TO_SIZE (g_hash_table_lookup (proxy_types, interface));
-	if (!proxy_type)
-		proxy_type = G_TYPE_DBUS_PROXY;
-
-	if (_nm_dbus_is_connection_private (connection))
-		name = NULL;
-	else
-		name = NM_DBUS_SERVICE;
-
-	g_async_initable_new_async (proxy_type, G_PRIORITY_DEFAULT,
-	                            cancellable, callback, user_data,
-	                            "g-connection", connection,
-	                            "g-flags", NM_DBUS_PROXY_FLAGS,
-	                            "g-name", name,
-	                            "g-object-path", path,
-	                            "g-interface-name", interface,
-	                            NULL);
-}
-
-GDBusProxy *
-_nm_dbus_new_proxy_for_connection_finish (GAsyncResult *result,
-                                          GError **error)
-{
-	GObject *source;
-	GDBusProxy *proxy;
-
-	source = g_async_result_get_source_object (result);
-	proxy = G_DBUS_PROXY (g_async_initable_new_finish (G_ASYNC_INITABLE (source), result, error));
-	g_object_unref (source);
-	_nm_dbus_proxy_replace_match (proxy);
-
-	return proxy;
-}
+#endif
 
 /* Binds the properties on a generated server-side GDBus object to the
  * corresponding properties on the public object.
