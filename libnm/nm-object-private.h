@@ -39,23 +39,11 @@ void _nm_object_register_properties (NMObject *object,
                                      const char *interface,
                                      const NMPropertiesInfo *info);
 
-void     _nm_object_reload_properties_async  (NMObject *object,
-                                              GCancellable *cancellable,
-                                              GAsyncReadyCallback callback,
-                                              gpointer user_data);
-gboolean _nm_object_reload_properties_finish (NMObject *object,
-                                              GAsyncResult *result,
-                                              GError **error);
-
 void _nm_object_queue_notify (NMObject *object, const char *property);
 
 void _nm_object_suppress_property_updates (NMObject *object, gboolean suppress);
 
 /* DBus property accessors */
-
-void _nm_object_reload_property (NMObject *object,
-                                 const char *interface,
-                                 const char *prop_name);
 
 void _nm_object_set_property (NMObject *object,
                               const char *interface,
@@ -70,9 +58,6 @@ void _nm_object_register_type_func (GType base_type,
                                     NMObjectDecideTypeFunc type_func,
                                     const char *interface,
                                     const char *property);
-
-#define NM_OBJECT_NM_RUNNING "nm-running-internal"
-gboolean _nm_object_get_nm_running (NMObject *self);
 
 void _nm_object_class_add_interface (NMObjectClass *object_class,
                                      const char    *interface);

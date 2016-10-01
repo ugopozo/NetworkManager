@@ -134,9 +134,6 @@ get_connection_by_string (NMRemoteSettings *settings,
 	NMConnection *candidate;
 	int i;
 
-	if (!_nm_object_get_nm_running (NM_OBJECT (settings)))
-		return NULL;
-
 	priv = NM_REMOTE_SETTINGS_GET_PRIVATE (settings);
 
 	for (i = 0; i < priv->visible_connections->len; i++) {
@@ -601,6 +598,7 @@ nm_remote_settings_save_hostname_finish (NMRemoteSettings *settings,
 		return g_simple_async_result_get_op_res_gboolean (simple);
 }
 
+#if 0
 static void
 updated_properties (GObject *object, GAsyncResult *result, gpointer user_data)
 {
@@ -612,53 +610,7 @@ updated_properties (GObject *object, GAsyncResult *result, gpointer user_data)
 		g_error_free (error);
 	}
 }
-
-static void
-nm_running_changed (GObject *object,
-                    GParamSpec *pspec,
-                    gpointer user_data)
-{
-	NMRemoteSettings *self = NM_REMOTE_SETTINGS (object);
-	NMRemoteSettingsPrivate *priv = NM_REMOTE_SETTINGS_GET_PRIVATE (self);
-
-	g_object_freeze_notify (object);
-
-	if (!_nm_object_get_nm_running (NM_OBJECT (self))) {
-		GPtrArray *connections;
-		int i;
-
-		nm_clear_g_cancellable (&priv->props_cancellable);
-
-		/* Clear connections */
-		connections = priv->all_connections;
-		priv->all_connections = g_ptr_array_new ();
-		for (i = 0; i < connections->len; i++)
-			g_signal_emit (self, signals[CONNECTION_REMOVED], 0, connections->pdata[i]);
-		g_ptr_array_unref (connections);
-
-		/* Clear properties */
-		if (priv->hostname) {
-			g_free (priv->hostname);
-			priv->hostname = NULL;
-			g_object_notify (G_OBJECT (self), NM_REMOTE_SETTINGS_HOSTNAME);
-		}
-
-		if (priv->can_modify) {
-			priv->can_modify = FALSE;
-			g_object_notify (G_OBJECT (self), NM_REMOTE_SETTINGS_CAN_MODIFY);
-		}
-
-		_nm_object_suppress_property_updates (NM_OBJECT (self), TRUE);
-	} else {
-		_nm_object_suppress_property_updates (NM_OBJECT (self), FALSE);
-
-		nm_clear_g_cancellable (&priv->props_cancellable);
-		priv->props_cancellable = g_cancellable_new ();
-		_nm_object_reload_properties_async (NM_OBJECT (self), priv->props_cancellable, updated_properties, self);
-	}
-
-	g_object_thaw_notify (object);
-}
+#endif
 
 /****************************************************************/
 
@@ -688,9 +640,6 @@ init_dbus (NMObject *object)
 	_nm_object_register_properties (object,
 	                                NM_DBUS_INTERFACE_SETTINGS,
 	                                property_info);
-
-	g_signal_connect (object, "notify::" NM_OBJECT_NM_RUNNING,
-	                  G_CALLBACK (nm_running_changed), object);
 }
 
 static GObject *
@@ -730,16 +679,26 @@ dispose (GObject *object)
 	NMRemoteSettingsPrivate *priv = NM_REMOTE_SETTINGS_GET_PRIVATE (self);
 	int i;
 
+	/// ???
+	nm_clear_g_cancellable (&priv->props_cancellable);
+
 	if (priv->all_connections) {
 		for (i = 0; i < priv->all_connections->len; i++)
 			cleanup_connection (self, priv->all_connections->pdata[i]);
 		g_clear_pointer (&priv->all_connections, g_ptr_array_unref);
 	}
 
-	g_signal_handlers_disconnect_by_func (object, G_CALLBACK (nm_running_changed), self);
-
 	g_clear_pointer (&priv->visible_connections, g_ptr_array_unref);
-	g_clear_pointer (&priv->hostname, g_free);
+
+	/* Clear properties */
+	if (priv->hostname) {
+		g_free (priv->hostname);
+		priv->hostname = NULL;
+	}
+
+	if (priv->can_modify) {
+		priv->can_modify = FALSE;
+	}
 
 	G_OBJECT_CLASS (nm_remote_settings_parent_class)->dispose (object);
 }

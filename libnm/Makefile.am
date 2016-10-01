@@ -78,7 +78,6 @@ libnm_la_private_headers =		\
 	nm-ip4-config.h			\
 	nm-ip6-config.h			\
 	nm-manager.h			\
-	nm-object-cache.h		\
 	nm-object-private.h		\
 	nm-remote-connection-private.h	\
 	nm-remote-settings.h
@@ -114,7 +113,6 @@ libnm_la_csources =			\
 	nm-ip4-config.c			\
 	nm-ip6-config.c			\
 	nm-manager.c			\
-	nm-object-cache.c		\
 	nm-object.c			\
 	nm-remote-connection.c		\
 	nm-remote-settings.c		\

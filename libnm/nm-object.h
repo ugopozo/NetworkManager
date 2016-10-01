@@ -39,6 +39,8 @@ G_BEGIN_DECLS
 
 #define NM_OBJECT_PATH "path"
 #define NM_OBJECT_DBUS_CONNECTION "dbus-connection"
+#define NM_OBJECT_DBUS_OBJECT "dbus-object"
+#define NM_OBJECT_DBUS_OBJECT_MANAGER "dbus-object-manager"
 
 /**
  * NMObject:
@@ -65,6 +67,8 @@ typedef struct {
 } NMObjectClass;
 
 GType nm_object_get_type (void);
+
+GType nm_object_get_interface_proxy_type (const char *interface);
 
 const char      *nm_object_get_path            (NMObject *object);
 

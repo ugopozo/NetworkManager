@@ -33,7 +33,6 @@
 #include "nm-access-point.h"
 #include "nm-device-private.h"
 #include "nm-object-private.h"
-#include "nm-object-cache.h"
 #include "nm-core-internal.h"
 #include "nm-dbus-helpers.h"
 
