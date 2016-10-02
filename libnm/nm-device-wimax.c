@@ -31,7 +31,6 @@
 #include "nm-wimax-nsp.h"
 #include "nm-object-private.h"
 #include "nm-core-internal.h"
-#include "nm-device-private.h"
 
 G_DEFINE_TYPE (NMDeviceWimax, nm_device_wimax, NM_TYPE_DEVICE)
 
@@ -354,8 +353,6 @@ get_hw_address (NMDevice *device)
 static void
 nm_device_wimax_init (NMDeviceWimax *device)
 {
-	_nm_device_set_device_type (NM_DEVICE (device), NM_DEVICE_TYPE_WIMAX);
-
 	g_signal_connect (device,
 	                  "notify::" NM_DEVICE_STATE,
 	                  G_CALLBACK (state_changed_cb),

@@ -41,21 +41,12 @@ static void nm_object_initable_iface_init (GInitableIface *iface);
 static void nm_object_async_initable_iface_init (GAsyncInitableIface *iface);
 
 typedef struct {
-	NMObjectDecideTypeFunc type_func;
-	char *interface;
-	char *property;
-} NMObjectTypeFuncData;
-
-static GHashTable *type_funcs;
-
-typedef struct {
 	GSList *interfaces;
 } NMObjectClassPrivate;
 
 #define NM_OBJECT_CLASS_GET_PRIVATE(k) (G_TYPE_CLASS_GET_PRIVATE ((k), NM_TYPE_OBJECT, NMObjectClassPrivate))
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (NMObject, nm_object, G_TYPE_OBJECT,
-                                  type_funcs = g_hash_table_new (NULL, NULL);
                                   g_type_add_class_private (g_define_type_id, sizeof (NMObjectClassPrivate));
                                   G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, nm_object_initable_iface_init);
                                   G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE, nm_object_async_initable_iface_init);
@@ -327,28 +318,6 @@ _nm_object_queue_notify (NMObject *object, const char *property)
 	_nm_object_queue_notify_full (object, property, NULL, FALSE, NULL);
 }
 
-void
-_nm_object_register_type_func (GType base_type,
-                               NMObjectDecideTypeFunc type_func,
-                               const char *interface,
-                               const char *property)
-{
-	NMObjectTypeFuncData *type_data;
-
-	g_return_if_fail (type_func != NULL);
-	g_return_if_fail (interface != NULL);
-	g_return_if_fail (property != NULL);
-
-	type_data = g_slice_new (NMObjectTypeFuncData);
-	type_data->type_func = type_func;
-	type_data->interface = g_strdup (interface);
-	type_data->property = g_strdup (property);
-
-	g_hash_table_insert (type_funcs,
-	                     GSIZE_TO_POINTER (base_type),
-	                     type_data);
-}
-
 typedef struct {
 	NMObject *self;
 	PropertyInfo *pi;
@@ -371,16 +340,6 @@ odata_free (gpointer data)
 }
 
 static void object_property_maybe_complete (NMObject *self, gboolean emit_now);
-
-
-typedef void (*NMObjectCreateCallbackFunc) (GObject *, const char *, gpointer);
-typedef struct {
-	char *path;
-	NMObjectCreateCallbackFunc callback;
-	gpointer user_data;
-	NMObjectTypeFuncData *type_data;
-	GDBusConnection *connection;
-} NMObjectTypeAsyncData;
 
 /* Stolen from dbus-glib */
 static char*

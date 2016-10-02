@@ -29,7 +29,6 @@
 #include "nm-utils.h"
 
 #include "nm-device-ethernet.h"
-#include "nm-device-private.h"
 #include "nm-object-private.h"
 
 G_DEFINE_TYPE (NMDeviceEthernet, nm_device_ethernet, NM_TYPE_DEVICE)
@@ -282,7 +281,6 @@ get_hw_address (NMDevice *device)
 static void
 nm_device_ethernet_init (NMDeviceEthernet *device)
 {
-	_nm_device_set_device_type (NM_DEVICE (device), NM_DEVICE_TYPE_ETHERNET);
 }
 
 static void

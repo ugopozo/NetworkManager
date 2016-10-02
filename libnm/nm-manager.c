@@ -29,7 +29,6 @@
 #include "nm-common-macros.h"
 #include "nm-device-ethernet.h"
 #include "nm-device-wifi.h"
-#include "nm-device-private.h"
 #include "nm-core-internal.h"
 #include "nm-object-private.h"
 #include "nm-active-connection.h"

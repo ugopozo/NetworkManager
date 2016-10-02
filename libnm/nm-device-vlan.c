@@ -28,7 +28,6 @@
 #include "nm-utils.h"
 
 #include "nm-device-vlan.h"
-#include "nm-device-private.h"
 #include "nm-object-private.h"
 
 G_DEFINE_TYPE (NMDeviceVlan, nm_device_vlan, NM_TYPE_DEVICE)
@@ -169,7 +168,6 @@ get_hw_address (NMDevice *device)
 static void
 nm_device_vlan_init (NMDeviceVlan *device)
 {
-	_nm_device_set_device_type (NM_DEVICE (device), NM_DEVICE_TYPE_VLAN);
 }
 
 static void

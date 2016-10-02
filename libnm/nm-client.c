@@ -29,7 +29,6 @@
 #include "nm-remote-settings.h"
 #include "nm-device-ethernet.h"
 #include "nm-device-wifi.h"
-#include "nm-device-private.h"
 #include "nm-core-internal.h"
 #include "nm-active-connection.h"
 #include "nm-vpn-connection.h"
@@ -80,7 +79,6 @@
 #include "nm-device-macvlan.h"
 #include "nm-device-modem.h"
 #include "nm-device-olpc-mesh.h"
-#include "nm-device-private.h"
 #include "nm-device-team.h"
 #include "nm-device-tun.h"
 #include "nm-device-vlan.h"
@@ -1999,7 +1997,7 @@ nm_object_for_gdbus_object (GDBusObject *object, gpointer user_data)
 			type = NM_TYPE_MANAGER;
 		else if (strcmp (ifname, NM_DBUS_INTERFACE_ACCESS_POINT) == 0)
 			type = NM_TYPE_ACCESS_POINT;
-		else if (strcmp (ifname, NM_DBUS_INTERFACE_ACTIVE_CONNECTION) == 0)
+		else if (strcmp (ifname, NM_DBUS_INTERFACE_ACTIVE_CONNECTION) == 0 && type != NM_TYPE_VPN_CONNECTION)
 			type = NM_TYPE_ACTIVE_CONNECTION;
 		else if (strcmp (ifname, NM_DBUS_INTERFACE_DEVICE_ADSL) == 0)
 			type = NM_TYPE_DEVICE_ADSL;
@@ -2035,8 +2033,6 @@ nm_object_for_gdbus_object (GDBusObject *object, gpointer user_data)
 			type = NM_TYPE_DEVICE_WIFI;
 		else if (strcmp (ifname, NM_DBUS_INTERFACE_DEVICE_WIMAX) == 0)
 			type = NM_TYPE_DEVICE_WIMAX;
-		else if (strcmp (ifname, NM_DBUS_INTERFACE_DEVICE) == 0)
-			type = NM_TYPE_DEVICE;
 		else if (strcmp (ifname, NM_DBUS_INTERFACE_DHCP4_CONFIG) == 0)
 			type = NM_TYPE_DHCP4_CONFIG;
 		else if (strcmp (ifname, NM_DBUS_INTERFACE_DHCP6_CONFIG) == 0)

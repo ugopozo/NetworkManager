@@ -54,11 +54,6 @@ void _nm_object_set_property (NMObject *object,
 /* object demarshalling support */
 typedef GType (*NMObjectDecideTypeFunc) (GVariant *);
 
-void _nm_object_register_type_func (GType base_type,
-                                    NMObjectDecideTypeFunc type_func,
-                                    const char *interface,
-                                    const char *property);
-
 GDBusProxy *_nm_object_get_proxy (NMObject   *object,
                                   const char *interface);
 

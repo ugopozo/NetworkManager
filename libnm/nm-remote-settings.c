@@ -33,7 +33,6 @@
 #include "nm-remote-connection-private.h"
 #include "nm-object-private.h"
 #include "nm-dbus-helpers.h"
-#include "nm-object-private.h"
 #include "nm-core-internal.h"
 
 #include "nmdbus-settings.h"

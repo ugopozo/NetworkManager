@@ -28,23 +28,7 @@
 
 #include "nm-dbus-interface.h"
 #include "nm-active-connection.h"
-#include "nm-device-ethernet.h"
-#include "nm-device-adsl.h"
-#include "nm-device-wifi.h"
-#include "nm-device-modem.h"
 #include "nm-device-bt.h"
-#include "nm-device-olpc-mesh.h"
-#include "nm-device-wimax.h"
-#include "nm-device-infiniband.h"
-#include "nm-device-bond.h"
-#include "nm-device-team.h"
-#include "nm-device-bridge.h"
-#include "nm-device-vlan.h"
-#include "nm-device-vxlan.h"
-#include "nm-device-generic.h"
-#include "nm-device-ip-tunnel.h"
-#include "nm-device-macvlan.h"
-#include "nm-device-private.h"
 #include "nm-dhcp4-config.h"
 #include "nm-dhcp6-config.h"
 #include "nm-ip4-config.h"
@@ -59,16 +43,10 @@
 
 #include "nmdbus-device.h"
 
-static GType _nm_device_decide_type (GVariant *value);
 static gboolean connection_compatible (NMDevice *device, NMConnection *connection, GError **error);
 static NMLldpNeighbor *nm_lldp_neighbor_dup (NMLldpNeighbor *neighbor);
 
-G_DEFINE_TYPE_WITH_CODE (NMDevice, nm_device, NM_TYPE_OBJECT,
-                         _nm_object_register_type_func (g_define_type_id,
-                                                        _nm_device_decide_type,
-                                                        NM_DBUS_INTERFACE_DEVICE,
-                                                        "DeviceType");
-                         )
+G_DEFINE_ABSTRACT_TYPE (NMDevice, nm_device, NM_TYPE_OBJECT);
 
 #define NM_DEVICE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), NM_TYPE_DEVICE, NMDevicePrivate))
 
@@ -273,64 +251,6 @@ device_state_reason_changed (GObject *object, GParamSpec *pspec, gpointer user_d
 	priv->last_seen_state = priv->state;
 }
 
-static GType
-_nm_device_gtype_from_dtype (NMDeviceType dtype)
-{
-	switch (dtype) {
-	case NM_DEVICE_TYPE_VETH:
-	case NM_DEVICE_TYPE_ETHERNET:
-		return NM_TYPE_DEVICE_ETHERNET;
-	case NM_DEVICE_TYPE_WIFI:
-		return NM_TYPE_DEVICE_WIFI;
-	case NM_DEVICE_TYPE_MODEM:
-		return NM_TYPE_DEVICE_MODEM;
-	case NM_DEVICE_TYPE_BT:
-		return NM_TYPE_DEVICE_BT;
-	case NM_DEVICE_TYPE_ADSL:
-		return NM_TYPE_DEVICE_ADSL;
-	case NM_DEVICE_TYPE_OLPC_MESH:
-		return NM_TYPE_DEVICE_OLPC_MESH;
-	case NM_DEVICE_TYPE_WIMAX:
-		return NM_TYPE_DEVICE_WIMAX;
-	case NM_DEVICE_TYPE_INFINIBAND:
-		return NM_TYPE_DEVICE_INFINIBAND;
-	case NM_DEVICE_TYPE_BOND:
-		return NM_TYPE_DEVICE_BOND;
-	case NM_DEVICE_TYPE_TEAM:
-		return NM_TYPE_DEVICE_TEAM;
-	case NM_DEVICE_TYPE_BRIDGE:
-		return NM_TYPE_DEVICE_BRIDGE;
-	case NM_DEVICE_TYPE_VLAN:
-		return NM_TYPE_DEVICE_VLAN;
-	case NM_DEVICE_TYPE_GENERIC:
-		return NM_TYPE_DEVICE_GENERIC;
-	case NM_DEVICE_TYPE_TUN:
-		return NM_TYPE_DEVICE_TUN;
-	case NM_DEVICE_TYPE_IP_TUNNEL:
-		return NM_TYPE_DEVICE_IP_TUNNEL;
-	case NM_DEVICE_TYPE_MACVLAN:
-		return NM_TYPE_DEVICE_MACVLAN;
-	case NM_DEVICE_TYPE_VXLAN:
-		return NM_TYPE_DEVICE_VXLAN;
-	default:
-		g_warning ("Unknown device type %d", dtype);
-		return G_TYPE_INVALID;
-	}
-}
-
-static void
-constructed (GObject *object)
-{
-	NMDevicePrivate *priv = NM_DEVICE_GET_PRIVATE (object);
-
-	G_OBJECT_CLASS (nm_device_parent_class)->constructed (object);
-
-	/* Catch failure of subclasses to call _nm_device_set_device_type() */
-	g_warn_if_fail (priv->device_type != NM_DEVICE_TYPE_UNKNOWN);
-	/* Catch a subclass setting the wrong type */
-	g_warn_if_fail (G_OBJECT_TYPE (object) == _nm_device_gtype_from_dtype (priv->device_type));
-}
-
 static void
 dispose (GObject *object)
 {
@@ -508,7 +428,6 @@ nm_device_class_init (NMDeviceClass *device_class)
 	g_type_class_add_private (device_class, sizeof (NMDevicePrivate));
 
 	/* virtual methods */
-	object_class->constructed = constructed;
 	object_class->get_property = get_property;
 	object_class->set_property = set_property;
 	object_class->dispose = dispose;
@@ -884,35 +803,6 @@ nm_device_class_init (NMDeviceClass *device_class)
 		              NULL, NULL, NULL,
 		              G_TYPE_NONE, 3,
 		              G_TYPE_UINT, G_TYPE_UINT, G_TYPE_UINT);
-}
-
-/**
- * _nm_device_set_device_type:
- * @device: the device
- * @dtype: the NM device type
- *
- * Sets the NM device type if it wasn't set during construction.  INTERNAL
- * ONLY METHOD.
- **/
-void
-_nm_device_set_device_type (NMDevice *device, NMDeviceType dtype)
-{
-	NMDevicePrivate *priv;
-
-	g_return_if_fail (device != NULL);
-	g_return_if_fail (dtype != NM_DEVICE_TYPE_UNKNOWN);
-
-	priv = NM_DEVICE_GET_PRIVATE (device);
-	if (priv->device_type == NM_DEVICE_TYPE_UNKNOWN)
-		priv->device_type = dtype;
-	else
-		g_warn_if_fail (dtype == priv->device_type);
-}
-
-static GType
-_nm_device_decide_type (GVariant *value)
-{
-	return _nm_device_gtype_from_dtype (g_variant_get_uint32 (value));
 }
 
 /**

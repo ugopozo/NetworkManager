@@ -25,7 +25,6 @@
 
 #include <string.h>
 
-#include "nm-device-private.h"
 #include "nm-object-private.h"
 
 #include "nm-setting-adsl.h"
@@ -89,7 +88,6 @@ get_setting_type (NMDevice *device)
 static void
 nm_device_adsl_init (NMDeviceAdsl *device)
 {
-	_nm_device_set_device_type (NM_DEVICE (device), NM_DEVICE_TYPE_ADSL);
 }
 
 static void

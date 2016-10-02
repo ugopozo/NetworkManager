@@ -31,7 +31,6 @@
 #include "nm-utils.h"
 
 #include "nm-access-point.h"
-#include "nm-device-private.h"
 #include "nm-object-private.h"
 #include "nm-core-internal.h"
 #include "nm-dbus-helpers.h"
@@ -661,8 +660,6 @@ static void
 nm_device_wifi_init (NMDeviceWifi *device)
 {
 	NMDeviceWifiPrivate *priv = NM_DEVICE_WIFI_GET_PRIVATE (device);
-
-	_nm_device_set_device_type (NM_DEVICE (device), NM_DEVICE_TYPE_WIFI);
 
 	g_signal_connect (device,
 	                  "notify::" NM_DEVICE_STATE,
