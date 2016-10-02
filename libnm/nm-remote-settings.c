@@ -597,20 +597,6 @@ nm_remote_settings_save_hostname_finish (NMRemoteSettings *settings,
 		return g_simple_async_result_get_op_res_gboolean (simple);
 }
 
-#if 0
-static void
-updated_properties (GObject *object, GAsyncResult *result, gpointer user_data)
-{
-	GError *error = NULL;
-
-	if (!_nm_object_reload_properties_finish (NM_OBJECT (object), result, &error)) {
-		if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-			g_warning ("%s: error reading NMRemoteSettings properties: %s", __func__, error->message);
-		g_error_free (error);
-	}
-}
-#endif
-
 /****************************************************************/
 
 static void
