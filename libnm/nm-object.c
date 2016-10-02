@@ -70,7 +70,6 @@ typedef struct {
 
 	GSList *property_tables;
 	NMObject *parent;
-	gboolean suppress_property_updates;
 
 	gboolean inited;        /* async init finished? */
 	GSList *waiters;        /* if async init did not finish, users of this object need
@@ -953,14 +952,6 @@ _nm_object_register_properties (NMObject *object,
 		pi->signal_prefix = tmp->signal_prefix;
 		g_hash_table_insert (instance, g_strdup (tmp->name), pi);
 	}
-}
-
-void
-_nm_object_suppress_property_updates (NMObject *object, gboolean suppress)
-{
-	NMObjectPrivate *priv = NM_OBJECT_GET_PRIVATE (object);
-
-	priv->suppress_property_updates = suppress;
 }
 
 void

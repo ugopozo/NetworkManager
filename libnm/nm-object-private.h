@@ -41,8 +41,6 @@ void _nm_object_register_properties (NMObject *object,
 
 void _nm_object_queue_notify (NMObject *object, const char *property);
 
-void _nm_object_suppress_property_updates (NMObject *object, gboolean suppress);
-
 /* DBus property accessors */
 
 void _nm_object_set_property (NMObject *object,
@@ -50,9 +48,6 @@ void _nm_object_set_property (NMObject *object,
                               const char *prop_name,
                               const char *format_string,
                               ...);
-
-/* object demarshalling support */
-typedef GType (*NMObjectDecideTypeFunc) (GVariant *);
 
 GDBusProxy *_nm_object_get_proxy (NMObject   *object,
                                   const char *interface);
