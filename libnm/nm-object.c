@@ -617,7 +617,6 @@ handle_object_array_property (NMObject *self, const char *property_name, GVarian
 	GObject *obj;
 	GVariantIter iter;
 	gsize npaths;
-	GPtrArray **array = pi->field;
 	const char *path;
 	ObjectCreatedData *odata;
 
@@ -657,7 +656,7 @@ handle_object_array_property (NMObject *self, const char *property_name, GVarian
 		g_object_unref (object);
 	}
 
-	return *array && ((*array)->len == npaths);
+	return TRUE;
 }
 
 static void
@@ -1077,7 +1076,7 @@ init_sync (GInitable *initable, GCancellable *cancellable, GError **error)
 		ObjectCreatedData *odata = priv->waiters->data;
 
 		priv->waiters = g_slist_remove (priv->waiters, odata);
-		object_property_maybe_complete (self, TRUE);
+		object_property_maybe_complete (odata->self, TRUE);
 	}
 
 	return TRUE;
