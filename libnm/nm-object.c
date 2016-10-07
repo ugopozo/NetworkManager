@@ -605,7 +605,7 @@ handle_object_property (NMObject *self, const char *property_name, GVariant *val
 	object_created (obj, path, odata);
 	g_object_unref (object);
 
-	return FALSE;
+	return TRUE;
 }
 
 static gboolean
