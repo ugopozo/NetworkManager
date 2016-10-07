@@ -1590,7 +1590,6 @@ main (int argc, char **argv)
 
 	loop = g_main_loop_new (NULL, FALSE);
 
-if (0) {
 	g_test_add_func ("/libnm/device-added", test_device_added);
 	g_test_add_func ("/libnm/device-added-signal-after-init", test_device_added_signal_after_init);
 	g_test_add_func ("/libnm/wifi-ap-added-removed", test_wifi_ap_added_removed);
@@ -1599,12 +1598,9 @@ if (0) {
 	g_test_add_func ("/libnm/client-nm-running", test_client_nm_running);
 	g_test_add_func ("/libnm/active-connections", test_active_connections);
 	g_test_add_func ("/libnm/activate-virtual", test_activate_virtual);
-}
 	g_test_add_func ("/libnm/activate-failed", test_activate_failed);
-if (0) {
 	g_test_add_func ("/libnm/device-connection-compatibility", test_device_connection_compatibility);
 	g_test_add_func ("/libnm/connection/invalid", test_connection_invalid);
-}
 
 	return g_test_run ();
 }
