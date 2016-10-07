@@ -738,13 +738,9 @@ properties_changed (GDBusProxy *proxy,
                     gpointer    user_data)
 {
 	NMObject *self = NM_OBJECT (user_data);
-	NMObjectPrivate *priv = NM_OBJECT_GET_PRIVATE (self);
 	GVariantIter iter;
 	const char *name;
 	GVariant *value;
-
-	if (priv->suppress_property_updates)
-		return;
 
 	g_variant_iter_init (&iter, changed_properties);
 	while (g_variant_iter_next (&iter, "{&sv}", &name, &value)) {
