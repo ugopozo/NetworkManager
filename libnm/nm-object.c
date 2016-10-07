@@ -439,6 +439,9 @@ object_property_maybe_complete (NMObject *self, gboolean emit_now)
 	GList *this;
 	int i;
 
+	/* The odata may hold the last reference. */
+	g_object_ref (self);
+
 	while ((this = g_list_first (priv->pending))) {
 		ObjectCreatedData *odata = this->data;
 		PropertyInfo *pi = odata->pi;
@@ -541,6 +544,8 @@ object_property_maybe_complete (NMObject *self, gboolean emit_now)
 		priv->pending = g_list_delete_link (priv->pending, this);
 		odata_free (odata);
 	}
+
+	g_object_unref (self);
 }
 
 static void
