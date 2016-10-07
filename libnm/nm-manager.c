@@ -743,18 +743,12 @@ typedef struct {
 	char *new_connection_path;
 } ActivateInfo;
 
-static void object_removed (GDBusObjectManager *object_manager, GDBusObject *object, gpointer user_data);
-
 static void
 activate_info_complete (ActivateInfo *info,
                         NMActiveConnection *active,
                         GError *error)
 {
 	NMManagerPrivate *priv = NM_MANAGER_GET_PRIVATE (info->manager);
-	GDBusObjectManager *object_manager = NULL;
-
-	g_object_get (info->manager, NM_OBJECT_DBUS_OBJECT_MANAGER, &object_manager, NULL); 
-	g_signal_handlers_disconnect_by_func (object_manager, G_CALLBACK (object_removed), info);
 
 	if (active)
 		g_simple_async_result_set_op_res_gpointer (info->simple, g_object_ref (active), g_object_unref);
@@ -800,6 +794,10 @@ recheck_pending_activations (NMManager *self)
 	NMActiveConnection *candidate;
 	const GPtrArray *devices;
 	NMDevice *device;
+	GDBusObjectManager *object_manager = NULL;
+	GError *error;
+
+	g_object_get (self, NM_OBJECT_DBUS_OBJECT_MANAGER, &object_manager, NULL); 
 
 	/* For each pending activation, look for an active connection that has the
 	 * pending activation's object path, where the active connection and its
@@ -808,8 +806,24 @@ recheck_pending_activations (NMManager *self)
 	 */
 	for (iter = priv->pending_activations; iter; iter = next) {
 		ActivateInfo *info = iter->data;
+		GDBusObject *dbus_obj;
 
 		next = g_slist_next (iter);
+
+		if (!info->active_path)
+			continue;
+
+		/* Check that the object manager still knows about the object.
+		 * It could be that it vanished before we even learned its name. */
+		dbus_obj = g_dbus_object_manager_get_object (object_manager, info->active_path);
+		if (!dbus_obj) {
+			error = g_error_new_literal (NM_CLIENT_ERROR,
+			                             NM_CLIENT_ERROR_OBJECT_CREATION_FAILED,
+			                             _("Active connection removed before it was initialized xx"));
+			activate_info_complete (info, NULL, error);
+			g_clear_error (&error);
+			break;
+		}
 
 		candidate = find_active_connection_by_path (self, info->active_path);
 		if (!candidate)
@@ -846,29 +860,12 @@ activation_cancelled (GCancellable *cancellable,
 }
 
 static void
-object_removed (GDBusObjectManager *object_manager, GDBusObject *object, gpointer user_data)
-{
-	ActivateInfo *info = user_data;
-	GError *error = NULL;
-
-	if (strcmp (info->active_path, g_dbus_object_get_object_path (object)))
-		return;
-
-	error = g_error_new_literal (NM_CLIENT_ERROR,
-	                             NM_CLIENT_ERROR_FAILED,
-	                             _("Active connection could not be attached to the device"));
-	activate_info_complete (info, NULL, error);
-	g_clear_error (&error);
-}
-
-static void
 activate_cb (GObject *object,
              GAsyncResult *result,
              gpointer user_data)
 {
 	ActivateInfo *info = user_data;
 	GError *error = NULL;
-	GDBusObjectManager *object_manager = NULL;
 
 	if (nmdbus_manager_call_activate_connection_finish (NMDBUS_MANAGER (object),
 	                                                    &info->active_path,
@@ -877,10 +874,6 @@ activate_cb (GObject *object,
 			info->cancelled_id = g_signal_connect (info->cancellable, "cancelled",
 			                                       G_CALLBACK (activation_cancelled), info);
 		}
-
-		g_object_get (info->manager, NM_OBJECT_DBUS_OBJECT_MANAGER, &object_manager, NULL); 
-		g_signal_connect (object_manager, "object-removed",
-		                  G_CALLBACK (object_removed), info);
 
 		recheck_pending_activations (info->manager);
 	} else {
@@ -948,7 +941,6 @@ add_activate_cb (GObject *object,
 {
 	ActivateInfo *info = user_data;
 	GError *error = NULL;
-	GDBusObjectManager *object_manager = NULL;
 
 	if (nmdbus_manager_call_add_and_activate_connection_finish (NMDBUS_MANAGER (object),
 	                                                            NULL,
@@ -958,10 +950,6 @@ add_activate_cb (GObject *object,
 			info->cancelled_id = g_signal_connect (info->cancellable, "cancelled",
 			                                       G_CALLBACK (activation_cancelled), info);
 		}
-
-		g_object_get (info->manager, NM_OBJECT_DBUS_OBJECT_MANAGER, &object_manager, NULL); 
-		g_signal_connect (object_manager, "object-removed",
-		                  G_CALLBACK (object_removed), info);
 
 		recheck_pending_activations (info->manager);
 	} else {
@@ -1068,33 +1056,7 @@ static void
 active_connection_removed (NMManager *self, NMActiveConnection *ac)
 {
 	g_signal_handlers_disconnect_by_func (ac, G_CALLBACK (ac_devices_changed), self);
-}
-
-static void
-object_creation_failed (NMObject *object, const char *failed_path)
-{
-	NMManager *self = NM_MANAGER (object);
-	NMManagerPrivate *priv = NM_MANAGER_GET_PRIVATE (self);
-	GError *error;
-	GSList *iter;
-
-	/* A newly activated connection failed due to some immediate error
-	 * and disappeared from active connection list.  Make sure the
-	 * callback gets called.
-	 */
-	error = g_error_new_literal (NM_CLIENT_ERROR,
-	                             NM_CLIENT_ERROR_OBJECT_CREATION_FAILED,
-	                             _("Active connection removed before it was initialized"));
-
-	for (iter = priv->pending_activations; iter; iter = iter->next) {
-		ActivateInfo *info = iter->data;
-
-		if (g_strcmp0 (failed_path, info->active_path) == 0) {
-			activate_info_complete (info, NULL, error);
-			g_error_free (error);
-			return;
-		}
-	}
+	recheck_pending_activations (self);
 }
 
 gboolean
@@ -1469,7 +1431,6 @@ nm_manager_class_init (NMManagerClass *manager_class)
 	object_class->finalize = finalize;
 
 	nm_object_class->init_dbus = init_dbus;
-	nm_object_class->object_creation_failed = object_creation_failed;
 
 	manager_class->device_added = device_added;
 	manager_class->device_removed = device_removed;
